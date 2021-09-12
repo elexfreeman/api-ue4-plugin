@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+DECLARE_LOG_CATEGORY_EXTERN(RkLog, Log, All);
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
@@ -9,13 +10,16 @@
 #include "Runtime/Online/HTTP/Public/Http.h"
 #include "Engine/EngineBaseTypes.h"
 #include "Math/UnrealMathUtility.h"
+#include "Containers/Queue.h"
 
 #include "FReserveStr.h"
+#include "RmCharInfo.h"
+#include "RmImgLoader.h"
 
 #include "RmApi.generated.h"
 
 UDELEGATE(BlueprintAuthorityOnly)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHttpResponse, FReserveStr, vData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadCharDone);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class RIKMORTYAPIPLG_API URmApi : public UActorComponent
@@ -33,37 +37,30 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	FHttpModule *Http = nullptr;
-
-	TQueue<FReserveStr> qReserve;
+	FHttpModule* Http = nullptr;
 
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
-	UPROPERTY(BlueprintReadWrite, BlueprintAssignable, BlueprintCallable, meta = (DisplayName = "eventOnHttpResponse", Category = "AA", MultiLine = "true"))
-	FOnHttpResponse eventOnHttpResponse;
+	
 
 	// API-URL
 
-	UPROPERTY(BlueprintReadWrite, Category = "AA")
-	FString sUrlCharList = TEXT("/api/character");
+	UPROPERTY(BlueprintReadWrite, BlueprintAssignable, BlueprintCallable, meta = (DisplayName = "eventOnLoadCharDone", Category = "AA", MultiLine = "true"))
+	FOnLoadCharDone eventOnLoadCharDone;
 
-	UPROPERTY(BlueprintReadWrite, Category = "AA")
-	FString sUrlLocationList = TEXT("/api/location");
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "AA")
+	TArray<URmCharInfo *> aChar;
 
-	UFUNCTION(BlueprintCallable, Category = "AA", meta = (ToolTip = "Загрузить локации"))
-	void fLoadLocation();
-
-	UFUNCTION(BlueprintCallable, Category = "AA", meta = (ToolTip = "Загрузть персонажей"))
-	void fLoadChar(const FString &sSearchStr);
-
-	UFUNCTION(BlueprintCallable, Category = "AA", meta = (ToolTip = "Отправить запрос на сервер"))
-	void fHttpCall(const FString &sUrl);
 
 	UFUNCTION(BlueprintCallable, Category = "AA_Net")
-	void fLocationListCtrl(FReserveStr vData);
+	void fCharListCtrl(const FString &sSearchStr);
 
-	void fOnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	UFUNCTION(BlueprintCallable, Category = "AA_Net")
+	UTexture2D *LoadTexture2DFromFile(const TArray<uint8> &RawFileData, bool &IsValid, int32 &Width, int32 &Height);
+
+
+	TSharedRef<IHttpRequest> fMakeRequest(FString sUrl);
+
 };
-

@@ -4,13 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "FRmCharLocation.h"
+#include "Engine/Texture2D.h"
 
-#include "FRmCharInfo.generated.h"
+#include "RmCharInfo.generated.h"
 
-USTRUCT(BlueprintType)
-struct RIKMORTYAPIPLG_API FRmCharInfo
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class RIKMORTYAPIPLG_API URmCharInfo : public UObject
 {
     GENERATED_BODY()
+
+public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AA")
     int32 id = 0;
@@ -25,6 +28,9 @@ struct RIKMORTYAPIPLG_API FRmCharInfo
     FString sGender = TEXT("");
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AA")
+    FString sSpecies = TEXT("");
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AA")
     FString sType = TEXT("");
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AA")
@@ -32,6 +38,9 @@ struct RIKMORTYAPIPLG_API FRmCharInfo
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AA")
     FString sImage = TEXT("");
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AA")
+    UTexture2D* texImage = nullptr;
     
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AA")
